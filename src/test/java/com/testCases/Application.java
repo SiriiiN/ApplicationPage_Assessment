@@ -24,16 +24,16 @@ public class Application {
 
 	@BeforeTest
 	public void before() throws InterruptedException {
-		
+
 		// creating chrome driver instance
 		ChromeDriverManager.getInstance().setup();
 		driver = new ChromeDriver();
-		
+
 		//launching web page
 		driver.get("https://www.hashtag-ca.com/careers/apply?jobCode=QAE001");
 		driver.manage().window().maximize();
-		
-		
+
+
 		WebElement element = driver.findElement(By.xpath("//*[@id=\"CcstyleSpaceIs\"]/div/div[1]/p/span"));
 		//scrolling down to enter input values 
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
@@ -76,7 +76,7 @@ public class Application {
 	@Test(dataProvider = "Input Data1")
 	public void applyWithDataProviderwithoutNPandExp(String scenario, String name, String email, String phone, String resume, String description) throws InterruptedException {
 
-        //reading input values from dataProvider class
+		//reading input values from dataProvider class
 		WebElement nameValue = driver.findElement(By.name("name"));
 		nameValue.sendKeys(name);
 
@@ -187,6 +187,25 @@ public class Application {
 			}
 
 		} 
+		//Resume validation
+		else if (scenario.equals("invalid resume")) {
+			if(!resume.matches(".doc") || !resume.matches(".pdf")  || !resume.matches(".docx")) {
+				String expected="File extension 'png' is not allowed. Allowed extensions are: 'pdf, doc, docx'.";
+				Thread.sleep(1000);
+				String actual=driver.findElement(By.cssSelector("#contact-form > div > div:nth-child(7) > p")).getText();
+				System.out.println("Expected error for name field: " + expected);
+				System.out.println("Actual error: " + actual);
+				Assert.assertEquals(actual, expected);
+			}
+
+		}
+		//Description validation
+		else if (scenario.equals("empty description")) {
+			Assert.assertEquals("something went wrong! please try again later",
+					driver.findElement(By.xpath("//*[@id=\"contact-form\"]/div/div[6]/p[2]"))
+					.getText());
+			
+		}
 
 
 
